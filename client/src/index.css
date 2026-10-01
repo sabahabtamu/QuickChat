@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Lusitana:wght@400;700&family=Outfit:wght@100..900&display=swap');
+
+@import "tailwindcss";
+
+* {
+  font-family: 'Outfit', sans-serif;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.media-gallery {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(156 163 175 / 0.55) transparent;
+}
+
+.media-gallery::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+
+.media-gallery::-webkit-scrollbar-thumb {
+  background-color: rgb(156 163 175 / 0.55);
+}
