@@ -14,6 +14,12 @@ const Sidebar = () => {
 
   const filteredUsers = input ? users.filter((user)=>user.fullName.toLowerCase().includes(input.toLowerCase())) : users;
 
+  const openMenu = () => {
+    const menu = document.querySelector(".group-hover\\:block");
+    if (menu) {
+      menu.classList.toggle("hidden");
+    }
+  }
   useEffect(()=>{
     getUsers();
   },[getUsers])
@@ -26,7 +32,7 @@ const Sidebar = () => {
         <div className="flex justify-between items-center">
           <img src={assets.logo} alt="Logo" className="max-w-40" />
           <div className="relative py-2 group">
-            <img
+            <img onClick={openMenu}
               src={assets.menu_icon}
               alt="Menu"
               className="max-h-5 cursor-pointer"
