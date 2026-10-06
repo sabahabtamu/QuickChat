@@ -1,8 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react"
 import assets from "../assets/assets"
 import { formatMessageTime } from "../lib/utils";
-import { ChatContext } from "../../context/ChatContext";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext, ChatContext } from "../../context/contexts";
 import toast from "react-hot-toast";
 
 const ChatContainer = () => {
@@ -42,7 +41,7 @@ const ChatContainer = () => {
     if(selectedUser){
       getMessages(selectedUser._id)
     }
-  },[selectedUser])
+  },[getMessages, selectedUser])
 
   useEffect(()=>{
     if(scrollEnd.current && messages){

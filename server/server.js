@@ -6,6 +6,7 @@ import { connectDB } from './lib/db.js';
 import userRouter from './routes/userRoutes.js';
 import messageRouter from './routes/messageRoutes.js';
 import { Server } from 'socket.io';
+import jwt from "jsonwebtoken";
 
 // Create Express app and HTTP server
 const app = express();
@@ -16,23 +17,47 @@ export const io = new Server(server, {
     cors: {origin: "*"}
 })
 
+io.use((socket, next) => {
+    try {
+        const token = socket.handshake.auth?.token;
+        if (!token) {
+            return next(new Error("Authentication required"));
+        }
+
+        const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+        if (!userId) {
+            return next(new Error("Invalid authentication token"));
+        }
+
+        socket.data.userId = String(userId);
+        next();
+    } catch {
+        next(new Error("Invalid authentication token"));
+    }
+});
+
 // Store online users
-export const userSocketMap = {}; // { userId: socketId }
+export const userSocketMap = new Map();
 
 // Socket.io connection handler
 io.on("connection", (socket)=>{
-    const userId = socket.handshake.query.userId;
+    const userId = socket.data.userId;
     console.log("User Connected", userId)
 
-    if(userId) userSocketMap[userId] = socket.id
+    socket.join(userId);
+    const userSockets = userSocketMap.get(userId) ?? new Set();
+    userSockets.add(socket.id);
+    userSocketMap.set(userId, userSockets);
     
     // Emit online users to all connected clients
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    io.emit("getOnlineUsers", [...userSocketMap.keys()]);
 
     socket.on("disconnect", ()=>{
         console.log("User Disconnected", userId);
-        delete userSocketMap[userId];
-        io.emit("getOnlineUsers", Object.keys(userSocketMap));
+        const sockets = userSocketMap.get(userId);
+        sockets?.delete(socket.id);
+        if (sockets?.size === 0) userSocketMap.delete(userId);
+        io.emit("getOnlineUsers", [...userSocketMap.keys()]);
     })
 })
 

@@ -3,6 +3,12 @@ import { generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
+const toPublicUser = (user) => {
+    const publicUser = user.toObject();
+    delete publicUser.password;
+    return publicUser;
+};
+
 // Signup new user
 export const signup = async (req, res) => {
     const { fullName, email, password, bio } = req.body;
@@ -25,7 +31,7 @@ export const signup = async (req, res) => {
 
         const token = generateToken(newUser._id)
 
-        return res.json({success: true, userData: newUser, token, message: "Account created successfully"})
+        return res.json({success: true, userData: toPublicUser(newUser), token, message: "Account created successfully"})
     } catch (error) {
         console.log(error.message)
         return res.json({success: false, message: error.message})
@@ -37,7 +43,7 @@ export const login = async (req, res) => {
     
     try {
         const {email, password} = req.body
-        if(!email, !password){
+        if(!email || !password){
             return res.json({success: false, message: "Missing Details"});
         }
         const user = await User.findOne({email});
@@ -53,7 +59,7 @@ export const login = async (req, res) => {
 
         const token = generateToken(user._id);
     
-        return res.json({success: true, userData: user, token, message: "Logged in successfully"})
+        return res.json({success: true, userData: toPublicUser(user), token, message: "Logged in successfully"})
     } catch (error) {
         console.log(error.message);
         res.json({success: false, message: error.message})
@@ -74,11 +80,11 @@ export const updateProfile = async (req, res) => {
         let updatedUser;
 
         if(!profilePic){
-            updatedUser = await User.findByIdAndUpdate(userId, {bio, fullName}, {new: true});
+            updatedUser = await User.findByIdAndUpdate(userId, {bio, fullName}, {new: true, runValidators: true}).select("-password");
         } else {
             const upload = await cloudinary.uploader.upload(profilePic);
 
-            updatedUser = await User.findByIdAndUpdate(userId, {profilePic: upload.secure_url, bio, fullName}, {new: true});
+            updatedUser = await User.findByIdAndUpdate(userId, {profilePic: upload.secure_url, bio, fullName}, {new: true, runValidators: true}).select("-password");
         }
         res.json({success: true, user: updatedUser})
     } catch (error) {

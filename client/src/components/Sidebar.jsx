@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router";
 import assets from "../assets/assets";
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import { ChatContext } from "../../context/ChatContext";
+import { AuthContext, ChatContext } from "../../context/contexts";
 
 const Sidebar = () => {
   
@@ -17,7 +16,7 @@ const Sidebar = () => {
 
   useEffect(()=>{
     getUsers();
-  },[])
+  },[getUsers])
 
   return (
     <div
