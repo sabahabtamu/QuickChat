@@ -56,6 +56,12 @@ Start the backend from the `server` directory:
 npm start
 ```
 
+From the `server` directory, run the backend in watch mode (requires Nodemon):
+
+```bash
+npm run server
+```
+
 In a second terminal, start the frontend from the `client` directory:
 
 ```bash
