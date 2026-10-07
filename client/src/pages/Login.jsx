@@ -3,7 +3,7 @@ import assets from "../assets/assets"
 import { AuthContext } from "../../context/contexts";
 
 const Login = () => {
-  const [currentState, setCurrentState] = useState("Sign up");
+  const [currentState, setCurrentState] = useState("Login");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
